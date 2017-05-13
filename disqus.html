@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,minimum-scale=1">
+        <title>Disqus</title>
+        <style>
+            body {
+              margin: 0;
+              padding: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <button id="action">Resize comments box</button>
+        <div id="disqus_thread"></div>
+        <script>
+        (function(d,w) { 
+            w.addEventListener('message', receiveMessage, false);
+            function updateSize(){
+                        window.parent.postMessage({
+                          sentinel: 'amp',
+                          type: 'embed-size',
+                          height: document.getElementById('disqus_thread').offsetHeight
+                        }, '*');  
+                        console.log(document.getElementById('disqus_thread').offsetHeight);
+            }
+            function receiveMessage(event)
+            {
+                if (event.data) {
+                    var msg;
+                    try {
+                        msg = JSON.parse(event.data);
+                    } catch (err) {}
+                    if (!msg)
+                        return false;
+                    if (msg.name === 'resize') {
+                        updateSize();
+                    }
+                }
+            }
+            var disqus_config = function () {
+                var sstr = window.location.search.substr(1);
+                this.page.url = sstr;  
+                this.page.identifier = sstr;
+                this.callbacks.onReady.push(function(){
+                    updateSize();
+                });
+            };
+            
+            s = d.createElement('script');
+            s.src = '//jamiros.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+            d.getElementById('action').onclick = function() {
+                updateSize();
+            }
+        })(document,window);
+        </script>
+    </body>
+</html>
